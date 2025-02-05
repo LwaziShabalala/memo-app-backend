@@ -14,6 +14,11 @@ app.use(cors({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// Health check
+app.get('/', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 app.post('/upload', upload.single('audio'), async (req, res) => {
     console.log('Request received at /upload');
     console.log('Headers:', req.headers);
@@ -30,7 +35,6 @@ app.post('/upload', upload.single('audio'), async (req, res) => {
         }
 
         console.log('Received audio file:', req.file.originalname, 'Size:', req.file.size);
-
         const formData = new FormData();
         formData.append('audio', req.file.buffer, {
             filename: req.file.originalname,
@@ -39,7 +43,7 @@ app.post('/upload', upload.single('audio'), async (req, res) => {
 
         const FASTAPI_URL = 'https://8001-01jd6w67mbzjnztarkx6j3a1he.cloudspaces.litng.ai/predict';
         console.log('Sending file to FastAPI...');
-
+        
         const response = await axios.post(FASTAPI_URL, formData, {
             headers: formData.getHeaders()
         });
@@ -51,5 +55,13 @@ app.post('/upload', upload.single('audio'), async (req, res) => {
         res.status(500).json({ error: 'Error processing audio file or transcription failed.' });
     }
 });
+
+// Add server listener for local development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 
 export default app;

@@ -7,10 +7,13 @@ import FormData from 'form-data';
 const app = express();
 
 app.use(cors({
-    origin: 'https://memoapp-two.vercel.app',
+    origin: [
+        'https://memoapp-two.vercel.app',
+        'https://memoapp-git-workingapp24-lwazi-shabalalas-projects.vercel.app',
+        'https://memoapp-p221db4k7-lwazi-shabalalas-projects.vercel.app'
+    ],
     credentials: true
 }));
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
